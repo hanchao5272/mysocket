@@ -1,16 +1,19 @@
-package pers.hanchao.mysocket.demo01.client;
+package pers.hanchao.mysocket.demo02.client;
+
+import org.apache.commons.lang3.RandomUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.Random;
 
 /**
- * <p>最简单的Socket客户端-进行一次会话</p>
+ * <p>可复用的Socket客户端-进行多次会话</p>
  *
  * @author hanchao 2018/5/3 22:35
  **/
-public class SimpleSocketClient01 {
+public class ReuseSocketClient {
     /**
      * <p></p>
      *
@@ -27,17 +30,27 @@ public class SimpleSocketClient01 {
         try {
             //建立客户端网络连接：建立一个到主机"127.0.0.1"的9527端口号的网络连接
             clientSocket = new Socket("127.0.0.1", 9527);
-            //获取输出流通道
+            //获取输出流/输入流通道
             os = clientSocket.getOutputStream();
-            //向服务端发送hello world
-            os.write("Hello World!".getBytes());
-            //获取输入流通道
             is = clientSocket.getInputStream();
-            //获取服务的返回的数据
-            byte[] bytes = new byte[1024];
-            int length = is.read(bytes);
-            //输出从服务的获取的数据
-            System.out.println("服务端的反馈信息：" + new String(bytes, 0, length));
+            //随机进行若干次会话
+            int number = RandomUtils.nextInt(5,10);
+            for (int i = 0; i < number; i++) {
+                //向服务端发送hello world
+                String message = RandomUtils.nextInt(1000,2000) + "";
+                os.write(message.getBytes());
+                //获取服务的返回的数据
+                byte[] bytes = new byte[1024];
+                int length = is.read(bytes);
+                //输出从服务的获取的数据
+                System.out.println("服务端的反馈信息：" + new String(bytes, 0, length));
+                try {
+                    //发送完成之后，休息1到2秒
+                    Thread.sleep(RandomUtils.nextInt(1000,2000));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

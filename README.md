@@ -26,3 +26,17 @@ Java网络编程的简单学习
    clientSocket = new Socket("127.0.0.1", 9527);
 02.获取输出流，发送数据=》获取输入流，接收数据=》关闭输入输出流
 03.关闭客户端连接clientSocket.close();
+
+## demo02-复用Socket连接
+网络连接需要解决的第1个问题：如何复用Socket连接，到达一次连接多次会话的目的
+方法：客户端多次发送，服务端轮询获取。
+客户端
+1.定义是否断开连接：boolean disconnect = false;
+2.如果没超时，就一直等待连接：while(!disconnect){//...}
+3.接收客户端发送来的信息
+  byte[] bytes = new byte[1024];
+  int length = is.read(bytes);
+4.如果读取的byte数组长度为-1，表示客户端关闭了本次连接，服务端也进行关闭
+  if (-1 == length){ disconnect = true;}
+客户端
+多次进行消息发送，直到无需再发送消息
