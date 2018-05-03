@@ -40,3 +40,23 @@ Java网络编程的简单学习
   if (-1 == length){ disconnect = true;}
 客户端
 多次进行消息发送，直到无需再发送消息
+
+## demo03-多路复用Socket连接
+多个客户端，每个客户端进行多次会话；提供多个客户端连接，每个客户端连接可以进行多次会话
+实现方式：多线程
+服务端
+try{
+  //如果等待5秒没有接受到消息，则关闭监听
+  serverListener.setSoTimeout(5000);
+  //一直去监听
+  while (true) {
+      //阻塞的去获取一次连接
+      onceSocket = serverListener.accept();
+      //每个连接建立一个线程去处理
+      new Thread(new ConnectionSocket(onceSocket)).start();
+  }
+} catch (SocketTimeoutException e) {
+  //等待时间超过5秒，不再等待，关闭连接
+  //e.printStackTrace();
+  System.out.println("等待超时...");
+}
